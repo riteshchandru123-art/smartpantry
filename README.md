@@ -1,74 +1,59 @@
-# 🥦 SmartPantry AI
+# 🥦💰 SmartPantry Pro: NutriWallet
 
-**Zero-Waste Smart Fridge Assistant** powered by **Gemini 1.5/2.5 Multimodal Vision**, **Streamlit**, and **DevOps automation**.
+**Zero-Waste Precision Macros & Grocery Savings Engine** powered by **Gemini 2.5 Multimodal Vision**, **Plotly**, and **DevOps automation**.
+
+> **"Hit your daily protein & calorie targets without burning your wallet or throwing out expired food."**
 
 ---
 
-## 🌟 Key Features
+## 🌟 Key Upgraded Features
 
-1. **📸 Multimodal Vision Scanning:** Snap a picture of your fridge, pantry, or grocery receipt. Gemini detects ingredients, estimates quantities, and predicts realistic expiration windows.
-2. **🧺 Expiry Watchdog:** Visual dashboard with expiration warnings (urgent alerts for items expiring within 3 days).
-3. **👨‍🍳 Zero-Waste AI Chef:** Autonomous recipe generator prioritizing ingredients closest to spoiling, adapting to meal type (Breakfast, Lunch, Dinner) and dietary restrictions (Vegetarian, High-Protein, Keto, etc.).
-4. **🚀 Cloud & DevOps Ready:**
-   - Production-ready `Dockerfile` (supports Cloud Run `$PORT`).
-   - `docker-compose.yml` for 1-command containerized execution.
-   - GitHub Actions CI/CD pipeline with automated `pytest` and container build.
+1. **🧾 Dual-Vision Intake (Fridge & Supermarket Receipts):**
+   - **Fridge & Shelves:** Detects food items, estimates shelf-life, and calculates total calories, protein (g), carbs (g), and healthy fats (g).
+   - **Receipt OCR:** Snap your paper grocery receipt (Walmart, Trader Joe's, Tesco, D-Mart, etc.). Gemini OCR extracts individual line items **and their purchase prices** to track the financial value of your fridge.
+2. **🏋️‍♂️ Target-Locked Macro Meal Synthesis:**
+   - Configure fitness objectives: *High-Protein Cut, Lean Muscle Bulk, Keto, or Budget Feast*.
+   - Dial in exact target protein (e.g., 45g) and calorie constraints.
+   - Generates recipes specifically formulated to hit your macro targets while prioritizing soon-to-expire groceries.
+3. **💸 "Cost-Per-Plate" & Takeout Savings Calculator:**
+   - Calculates the cost to cook at home vs. equivalent restaurant/DoorDash delivery orders.
+   - Calculates **Protein Efficiency** (e.g., *\$0.05 per gram of protein*).
+   - Computes live money saved per meal.
+4. **📊 Daily Health & Wallet Tracker (Plotly):**
+   - Interactive macro donut charts and daily progress rings.
+   - One-click "I Cooked This Meal!" logger tracking daily cumulative protein and dollars saved.
 
 ---
 
 ## 🛠️ Quickstart (Run Locally)
 
-### 1. Clone & Install Dependencies
+### 1. Install Dependencies
 ```bash
-cd smartpantry
 pip install -r requirements.txt
 ```
 
 ### 2. Configure Your API Key
-Copy `.env.example` to `.env`:
-```bash
-cp .env.example .env
-```
-Add your free Gemini API key from [Google AI Studio](https://aistudio.google.com):
+Add your free Gemini API key from [Google AI Studio](https://aistudio.google.com) to `.env`:
 ```env
 GEMINI_API_KEY=your_actual_key_here
 ```
-*(You can also enter your key directly inside the app's sidebar).*
 
-### 3. Run the App
+### 3. Launch App
 ```bash
-streamlit run app.py
+python -m streamlit run app.py
 ```
-Open your browser at `http://localhost:8501`.
+Open **`http://localhost:8501`** in your browser.
 
 ---
 
 ## 🧪 Running Automated Tests
 ```bash
-pytest -v tests/
+python -m unittest discover tests/
 ```
 
 ---
 
-## 🐳 Running with Docker
-
-### Using Docker Compose
+## 🐳 Docker Execution
 ```bash
 docker compose up --build
 ```
-Access the app at `http://localhost:8501`.
-
----
-
-## ☁️ Deploying to the Cloud (Google Cloud Run in 2 Minutes)
-
-1. Make sure you have Google Cloud SDK installed.
-2. Build and deploy directly with:
-```bash
-gcloud run deploy smartpantry \
-  --source . \
-  --region us-central1 \
-  --allow-unauthenticated \
-  --set-env-vars GEMINI_API_KEY=your_key_here
-```
-You will get a live HTTPS URL you can open on your phone or share with anyone!

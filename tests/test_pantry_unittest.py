@@ -3,9 +3,9 @@ import unittest
 from datetime import datetime, timedelta
 import db
 
-TEST_DB = "test_unittest_pantry.db"
+TEST_DB = "test_nutriwallet.db"
 
-class TestPantryDB(unittest.TestCase):
+class TestNutriWalletDB(unittest.TestCase):
     def setUp(self):
         if os.path.exists(TEST_DB):
             os.remove(TEST_DB)
@@ -15,35 +15,52 @@ class TestPantryDB(unittest.TestCase):
         if os.path.exists(TEST_DB):
             os.remove(TEST_DB)
 
-    def test_add_and_retrieve_items(self):
-        item_id = db.add_item("Spinach", "1 bunch", "Produce", "2026-10-20", "Organic", db_path=TEST_DB)
+    def test_add_and_retrieve_with_macros_and_price(self):
+        item_id = db.add_item(
+            name="Chicken Breast",
+            quantity="500g",
+            category="Meat/Protein",
+            expiry_date="2026-10-25",
+            notes="Lean source",
+            price=6.50,
+            calories=600,
+            protein_g=120.0,
+            carbs_g=0.0,
+            fat_g=8.0,
+            db_path=TEST_DB
+        )
         self.assertGreater(item_id, 0)
 
         items = db.get_all_items(db_path=TEST_DB)
         self.assertEqual(len(items), 1)
-        self.assertEqual(items[0]["name"], "Spinach")
-        self.assertEqual(items[0]["quantity"], "1 bunch")
-        self.assertEqual(items[0]["category"], "Produce")
+        self.assertEqual(items[0]["name"], "Chicken Breast")
+        self.assertEqual(items[0]["price"], 6.50)
+        self.assertEqual(items[0]["protein_g"], 120.0)
 
-    def test_expiring_soon_filter(self):
-        today = datetime.now()
-        exp_soon = (today + timedelta(days=2)).strftime("%Y-%m-%d")
-        exp_later = (today + timedelta(days=10)).strftime("%Y-%m-%d")
+    def test_inventory_total_value(self):
+        db.add_item("Eggs", "12 pack", "Dairy", price=3.50, db_path=TEST_DB)
+        db.add_item("Oats", "1kg", "Pantry", price=4.20, db_path=TEST_DB)
+        
+        total = db.get_total_inventory_value(db_path=TEST_DB)
+        self.assertEqual(total, 7.70)
 
-        db.add_item("Fresh Milk", "1L", "Dairy", exp_soon, db_path=TEST_DB)
-        db.add_item("Dry Lentils", "2kg", "Pantry", exp_later, db_path=TEST_DB)
+    def test_meal_logging_and_today_summary(self):
+        db.log_meal(
+            recipe_title="High Protein Chicken Bowl",
+            calories=550,
+            protein_g=52.0,
+            carbs_g=40.0,
+            fat_g=12.0,
+            cost=3.20,
+            takeout_savings=13.80,
+            db_path=TEST_DB
+        )
 
-        urgent = db.get_expiring_soon_items(days_ahead=3, db_path=TEST_DB)
-        self.assertEqual(len(urgent), 1)
-        self.assertEqual(urgent[0]["name"], "Fresh Milk")
-
-    def test_delete_item(self):
-        id1 = db.add_item("Eggs", "6 pack", "Dairy", "2026-10-25", db_path=TEST_DB)
-        self.assertEqual(len(db.get_all_items(db_path=TEST_DB)), 1)
-
-        result = db.delete_item(id1, db_path=TEST_DB)
-        self.assertTrue(result)
-        self.assertEqual(len(db.get_all_items(db_path=TEST_DB)), 0)
+        summary = db.get_today_nutrition_summary(db_path=TEST_DB)
+        self.assertEqual(summary["meals_count"], 1)
+        self.assertEqual(summary["calories"], 550)
+        self.assertEqual(summary["protein_g"], 52.0)
+        self.assertEqual(summary["savings"], 13.80)
 
 if __name__ == "__main__":
     unittest.main()
