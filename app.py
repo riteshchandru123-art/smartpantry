@@ -4,8 +4,10 @@ import streamlit as st
 from PIL import Image
 from dotenv import load_dotenv
 
+import importlib
 import db
 import ai_service
+importlib.reload(ai_service)
 
 # Load environment variables
 load_dotenv()
