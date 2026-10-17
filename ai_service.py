@@ -4,6 +4,9 @@ from datetime import datetime, timedelta
 from typing import List, Dict, Any, Optional
 from pydantic import BaseModel, Field
 from PIL import Image
+from google import genai
+
+MODEL_NAME = "gemini-flash-latest"
 
 # --- Pydantic Data Schemas ---
 
@@ -74,9 +77,11 @@ def analyze_pantry_image(image: Image.Image, api_key: Optional[str] = None) -> L
     if not key:
         raise ValueError("Missing GEMINI_API_KEY. Please set it in the sidebar.")
 
+    client = genai.Client(api_key=key)
+
     prompt = (
         "You are NutriWallet's multimodal computer vision system. Inspect this photo of a refrigerator, "
-        "pantry shelf, or counter. Identify all distinct food items, produce, proteins, dairy, and ingredients visible. "
+        "pantry shelf, or food package. Identify all distinct food items, produce, proteins, dairy, snacks, and ingredients visible. "
         "For each item:\n"
         "1. Estimate realistic quantity/volume.\n"
         "2. Predict shelf-life in days.\n"
@@ -85,10 +90,8 @@ def analyze_pantry_image(image: Image.Image, api_key: Optional[str] = None) -> L
     )
 
     try:
-        from google import genai
-        client = genai.Client(api_key=key)
         response = client.models.generate_content(
-            model='gemini-2.5-flash',
+            model=MODEL_NAME,
             contents=[prompt, image],
             config={
                 'response_mime_type': 'application/json',
@@ -96,36 +99,6 @@ def analyze_pantry_image(image: Image.Image, api_key: Optional[str] = None) -> L
             },
         )
         data = json.loads(response.text)
-        today = datetime.now()
-        results = []
-        for item in data.get("items", []):
-            days = item.get("estimated_shelf_life_days", 5)
-            expiry_date = (today + timedelta(days=days)).strftime("%Y-%m-%d")
-            results.append({
-                "name": item["name"],
-                "quantity": item["quantity"],
-                "category": item["category"],
-                "expiry_date": expiry_date,
-                "price": round(float(item.get("estimated_price", 2.50)), 2),
-                "calories": int(item.get("calories", 100)),
-                "protein_g": round(float(item.get("protein_g", 5.0)), 1),
-                "carbs_g": round(float(item.get("carbs_g", 10.0)), 1),
-                "fat_g": round(float(item.get("fat_g", 2.0)), 1),
-                "notes": f"Auto-detected. ~{days}d shelf life."
-            })
-        return results
-
-    except Exception:
-        # Fallback to legacy SDK
-        import google.generativeai as legacy_genai
-        legacy_genai.configure(api_key=key)
-        model = legacy_genai.GenerativeModel('gemini-1.5-flash')
-        resp = model.generate_content([
-            prompt + "\nReturn JSON with schema: {\"items\": [{\"name\": \"...\", \"quantity\": \"...\", \"category\": \"Produce\", \"estimated_shelf_life_days\": 5, \"estimated_price\": 3.0, \"calories\": 120, \"protein_g\": 4.0, \"carbs_g\": 15.0, \"fat_g\": 1.0}]}",
-            image
-        ])
-        cleaned = resp.text.strip().removeprefix("```json").removesuffix("```").strip()
-        data = json.loads(cleaned)
         today = datetime.now()
         results = []
         for item in data.get("items", []):
@@ -144,6 +117,8 @@ def analyze_pantry_image(image: Image.Image, api_key: Optional[str] = None) -> L
                 "notes": f"Auto-detected. ~{days}d shelf life."
             })
         return results
+    except Exception as e:
+        raise RuntimeError(f"Gemini Vision Error: {str(e)}")
 
 def analyze_receipt_image(image: Image.Image, api_key: Optional[str] = None) -> Dict[str, Any]:
     """
@@ -154,6 +129,8 @@ def analyze_receipt_image(image: Image.Image, api_key: Optional[str] = None) -> 
     if not key:
         raise ValueError("Missing GEMINI_API_KEY. Please set it in the sidebar.")
 
+    client = genai.Client(api_key=key)
+
     prompt = (
         "You are NutriWallet's receipt OCR specialist. Inspect this paper supermarket receipt. "
         "Extract the store name, the total amount spent, and parse every individual food or grocery item "
@@ -162,10 +139,8 @@ def analyze_receipt_image(image: Image.Image, api_key: Optional[str] = None) -> 
     )
 
     try:
-        from google import genai
-        client = genai.Client(api_key=key)
         response = client.models.generate_content(
-            model='gemini-2.5-flash',
+            model=MODEL_NAME,
             contents=[prompt, image],
             config={
                 'response_mime_type': 'application/json',
@@ -196,37 +171,7 @@ def analyze_receipt_image(image: Image.Image, api_key: Optional[str] = None) -> 
             "items": items
         }
     except Exception as e:
-        # Fallback to legacy SDK
-        import google.generativeai as legacy_genai
-        legacy_genai.configure(api_key=key)
-        model = legacy_genai.GenerativeModel('gemini-1.5-flash')
-        resp = model.generate_content([
-            prompt + "\nReturn JSON schema: {\"store_name\": \"...\", \"total_spent\": 25.50, \"items\": [{\"name\": \"...\", \"quantity\": \"...\", \"price\": 4.99, \"category\": \"Produce\", \"estimated_shelf_life_days\": 5, \"calories\": 100, \"protein_g\": 2.0, \"carbs_g\": 10.0, \"fat_g\": 1.0}]}",
-            image
-        ])
-        cleaned = resp.text.strip().removeprefix("```json").removesuffix("```").strip()
-        data = json.loads(cleaned)
-        today = datetime.now()
-        items = []
-        for item in data.get("items", []):
-            days = item.get("estimated_shelf_life_days", 7)
-            items.append({
-                "name": item["name"],
-                "quantity": item.get("quantity", "1 pack"),
-                "category": item.get("category", "Pantry"),
-                "price": round(float(item.get("price", 0.0)), 2),
-                "expiry_date": (today + timedelta(days=days)).strftime("%Y-%m-%d"),
-                "calories": int(item.get("calories", 150)),
-                "protein_g": round(float(item.get("protein_g", 8.0)), 1),
-                "carbs_g": round(float(item.get("carbs_g", 15.0)), 1),
-                "fat_g": round(float(item.get("fat_g", 3.0)), 1),
-                "notes": f"Receipt from {data.get('store_name', 'Store')}."
-            })
-        return {
-            "store_name": data.get("store_name", "Supermarket"),
-            "total_spent": round(float(data.get("total_spent", 0.0)), 2),
-            "items": items
-        }
+        raise RuntimeError(f"Receipt OCR Error: {str(e)}")
 
 
 # --- Precision Macro & Cost-Per-Plate Recipe Generator ---
@@ -248,6 +193,8 @@ def generate_recipe(
     key = api_key or os.getenv("GEMINI_API_KEY")
     if not key:
         raise ValueError("Missing GEMINI_API_KEY. Please set it in the sidebar.")
+
+    client = genai.Client(api_key=key)
 
     pantry_summary = "\n".join([
         f"- {it['name']} (Qty: {it['quantity']}, Est. Price: ${it.get('price', 2.0):.2f}, ~{it.get('protein_g', 0)}g protein)"
@@ -286,10 +233,8 @@ def generate_recipe(
     """
 
     try:
-        from google import genai
-        client = genai.Client(api_key=key)
         response = client.models.generate_content(
-            model='gemini-2.5-flash',
+            model=MODEL_NAME,
             contents=prompt,
             config={
                 'response_mime_type': 'application/json',
@@ -297,11 +242,5 @@ def generate_recipe(
             },
         )
         return json.loads(response.text)
-    except Exception:
-        # Fallback to legacy SDK
-        import google.generativeai as legacy_genai
-        legacy_genai.configure(api_key=key)
-        model = legacy_genai.GenerativeModel('gemini-1.5-flash')
-        resp = model.generate_content(prompt + "\nReturn strictly JSON.")
-        cleaned = resp.text.strip().removeprefix("```json").removesuffix("```").strip()
-        return json.loads(cleaned)
+    except Exception as e:
+        raise RuntimeError(f"Recipe Generation Error: {str(e)}")
