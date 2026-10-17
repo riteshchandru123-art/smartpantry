@@ -11,55 +11,212 @@ import ai_service
 load_dotenv()
 
 st.set_page_config(
-    page_title="SmartPantry Pro | NutriWallet",
-    page_icon="🥦",
+    page_title="NutriWallet AI • Smart Kitchen",
+    page_icon="🥑",
     layout="wide",
     initial_sidebar_state="expanded"
 )
 
-# Initialize database with new migrations
+# Initialize database
 db.init_db()
 
-# --- Custom Styling ---
+# --- High-End CSS Styling ---
 st.markdown("""
 <style>
-    .metric-card {
-        background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
-        border-radius: 12px;
-        padding: 16px;
-        border: 1px solid #dee2e6;
-        box-shadow: 0 2px 4px rgba(0,0,0,0.04);
+    @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
+    
+    html, body, [class*="css"] {
+        font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
     }
-    .savings-badge {
-        background-color: #d4edda;
-        color: #155724;
-        padding: 6px 12px;
-        border-radius: 8px;
-        font-weight: 700;
+
+    /* Hero Header */
+    .hero-banner {
+        background: linear-gradient(135deg, #091e3a 0%, #102a45 40%, #064e3b 100%);
+        border-radius: 20px;
+        padding: 32px 36px;
+        color: white;
+        margin-bottom: 28px;
+        border: 1px solid rgba(255, 255, 255, 0.12);
+        box-shadow: 0 12px 35px rgba(0, 0, 0, 0.12);
+        position: relative;
+        overflow: hidden;
+    }
+    .hero-banner h1 {
+        font-size: 2.3rem !important;
+        font-weight: 800 !important;
+        letter-spacing: -0.02em;
+        margin-bottom: 8px !important;
+        background: linear-gradient(90deg, #ffffff 0%, #a7f3d0 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+    }
+    .hero-banner p {
+        font-size: 1.05rem;
+        color: #cbd5e1;
+        margin-bottom: 0;
+        max-width: 750px;
+    }
+    .hero-pill {
         display: inline-block;
+        background: rgba(16, 185, 129, 0.2);
+        color: #6ee7b7;
+        border: 1px solid rgba(110, 231, 183, 0.3);
+        padding: 4px 12px;
+        border-radius: 50px;
+        font-size: 0.8rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        margin-bottom: 12px;
     }
-    .macro-badge {
-        background-color: #cce5ff;
-        color: #004085;
-        padding: 4px 8px;
-        border-radius: 6px;
+
+    /* KPI / Stat Cards */
+    .kpi-card {
+        background: #ffffff;
+        border-radius: 16px;
+        padding: 20px 22px;
+        border: 1px solid #e2e8f0;
+        box-shadow: 0 4px 18px rgba(0, 0, 0, 0.03);
+        transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+        position: relative;
+        overflow: hidden;
+    }
+    .kpi-card:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 12px 28px rgba(6, 78, 59, 0.08);
+        border-color: #cbd5e1;
+    }
+    .kpi-card::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 4px;
+        background: linear-gradient(90deg, #10b981, #06b6d4);
+    }
+    .kpi-label {
+        font-size: 0.82rem;
+        color: #64748b;
         font-weight: 600;
-        font-size: 0.85rem;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        margin-bottom: 6px;
     }
-    .warning-badge {
-        background-color: #ffeaa7;
-        color: #d63031;
-        padding: 4px 8px;
-        border-radius: 6px;
-        font-weight: bold;
+    .kpi-val {
+        font-size: 1.85rem;
+        font-weight: 800;
+        color: #0f172a;
+        letter-spacing: -0.02em;
+        line-height: 1.1;
     }
-    .good-badge {
-        background-color: #55efc4;
-        color: #00b894;
-        padding: 4px 8px;
-        border-radius: 6px;
-        font-weight: bold;
+    .kpi-sub {
+        font-size: 0.82rem;
+        color: #10b981;
+        font-weight: 600;
+        margin-top: 6px;
     }
+
+    /* Food Item Card */
+    .food-card {
+        background: #ffffff;
+        border-radius: 14px;
+        padding: 16px 20px;
+        border: 1px solid #f1f5f9;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.02);
+        margin-bottom: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        transition: all 0.2s ease;
+    }
+    .food-card:hover {
+        border-color: #cbd5e1;
+        box-shadow: 0 6px 16px rgba(0, 0, 0, 0.05);
+    }
+
+    /* Badges */
+    .tag-macro {
+        background: #f0fdf4;
+        color: #166534;
+        border: 1px solid #bbf7d0;
+        font-weight: 700;
+        font-size: 0.78rem;
+        padding: 4px 10px;
+        border-radius: 8px;
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+    }
+    .tag-price {
+        background: #eff6ff;
+        color: #1e40af;
+        border: 1px solid #bfdbfe;
+        font-weight: 700;
+        font-size: 0.78rem;
+        padding: 4px 10px;
+        border-radius: 8px;
+    }
+    .tag-urgency-danger {
+        background: #fef2f2;
+        color: #991b1b;
+        border: 1px solid #fecaca;
+        font-weight: 700;
+        font-size: 0.78rem;
+        padding: 4px 10px;
+        border-radius: 8px;
+    }
+    .tag-urgency-warning {
+        background: #fffbeb;
+        color: #92400e;
+        border: 1px solid #fde68a;
+        font-weight: 700;
+        font-size: 0.78rem;
+        padding: 4px 10px;
+        border-radius: 8px;
+    }
+    .tag-urgency-good {
+        background: #f0fdf4;
+        color: #15803d;
+        border: 1px solid #bbf7d0;
+        font-weight: 700;
+        font-size: 0.78rem;
+        padding: 4px 10px;
+        border-radius: 8px;
+    }
+
+    /* Savings Hero Card */
+    .savings-showcase {
+        background: linear-gradient(135deg, #052e16 0%, #14532d 100%);
+        border-radius: 16px;
+        padding: 24px 28px;
+        color: white;
+        margin: 20px 0;
+        border: 1px solid #22c55e40;
+        box-shadow: 0 10px 25px rgba(20, 83, 45, 0.2);
+    }
+    .savings-showcase h3 {
+        color: #86efac !important;
+        font-weight: 800;
+        margin-bottom: 4px;
+        font-size: 1.4rem;
+    }
+
+    /* Recipe Step List */
+    .step-box {
+        background: #f8fafc;
+        border-radius: 12px;
+        padding: 14px 18px;
+        margin-bottom: 10px;
+        border-left: 4px solid #10b981;
+        font-size: 0.95rem;
+        line-height: 1.5;
+        color: #334155;
+    }
+
+    /* Hide Streamlit default branding watermark */
+    #MainMenu {visibility: hidden;}
+    footer {visibility: hidden;}
 </style>
 """, unsafe_allow_html=True)
 
@@ -67,23 +224,26 @@ st.markdown("""
 def render_macro_donut(protein_g: float, carbs_g: float, fat_g: float, title: str = "Macronutrient Split"):
     try:
         import plotly.graph_objects as go
-        labels = ['Protein (g)', 'Carbs (g)', 'Fat (g)']
-        values = [protein_g, carbs_g, fat_g]
-        colors = ['#3498db', '#2ecc71', '#e67e22']
+        labels = ['Protein', 'Carbohydrates', 'Healthy Fats']
+        values = [max(protein_g, 0.1), max(carbs_g, 0.1), max(fat_g, 0.1)]
+        colors = ['#10b981', '#0ea5e9', '#f59e0b']
         
         fig = go.Figure(data=[go.Pie(
             labels=labels,
             values=values,
-            hole=.6,
-            marker=dict(colors=colors),
-            textinfo='label+percent',
-            hoverinfo='label+value'
+            hole=.65,
+            marker=dict(colors=colors, line=dict(color='#ffffff', width=2)),
+            textinfo='percent+label',
+            hoverinfo='label+value',
+            textposition='outside'
         )])
         fig.update_layout(
-            title=title,
+            title=dict(text=f"<b>{title}</b>", font=dict(size=14, color="#334155", family="Plus Jakarta Sans")),
             showlegend=False,
-            margin=dict(t=35, b=10, l=10, r=10),
-            height=220
+            margin=dict(t=40, b=15, l=15, r=15),
+            height=240,
+            paper_bgcolor='rgba(0,0,0,0)',
+            plot_bgcolor='rgba(0,0,0,0)'
         )
         return fig
     except Exception:
@@ -91,122 +251,187 @@ def render_macro_donut(protein_g: float, carbs_g: float, fat_g: float, title: st
 
 # --- Sidebar Configuration ---
 with st.sidebar:
-    st.title("🥦 NutriWallet AI")
-    st.caption("Precision Macros • Zero-Waste • Wallet Savings")
+    st.markdown("""
+        <div style='text-align: center; padding: 10px 0;'>
+            <div style='font-size: 2.8rem;'>🥑</div>
+            <h2 style='margin: 0; font-weight: 800; font-size: 1.5rem; color: #0f172a;'>NutriWallet</h2>
+            <p style='color: #64748b; font-size: 0.85rem; margin-top: 2px;'>AI Precision Macros & Budget Engine</p>
+        </div>
+    """, unsafe_allow_html=True)
     
-    # API Key Handling
+    # API Key Input with clean badge
     env_key = os.getenv("GEMINI_API_KEY", "")
     api_key = st.text_input(
-        "Google Gemini API Key",
+        "🔑 Gemini API Key",
         value=env_key,
         type="password",
-        help="Get a free key at https://aistudio.google.com"
+        help="Free key from https://aistudio.google.com"
     )
     if api_key:
         st.session_state["api_key"] = api_key
-        st.success("API Key Active", icon="🔑")
+        st.markdown("<span class='tag-urgency-good'>● AI Engine Online</span>", unsafe_allow_html=True)
     else:
-        st.warning("Enter Gemini API Key to enable Vision & AI Chef.")
+        st.markdown("<span class='tag-urgency-danger'>● Missing API Key</span>", unsafe_allow_html=True)
 
     st.divider()
 
-    # Financial & Inventory Metrics
+    # Sidebar Quick Stats
     all_items = db.get_all_items()
     expiring_items = db.get_expiring_soon_items(days_ahead=3)
     total_val = db.get_total_inventory_value()
     today_stats = db.get_today_nutrition_summary()
 
-    st.markdown("### 📊 Live Health & Wallet Tracker")
-    c_side1, c_side2 = st.columns(2)
-    c_side1.metric("Pantry Value", f"${total_val:.2f}")
-    c_side2.metric("Saved Today", f"+${today_stats['savings']:.2f}")
+    st.markdown("#### ⚡ Quick Overview")
+    sc1, sc2 = st.columns(2)
+    sc1.metric("Stocked", f"{len(all_items)} items")
+    sc2.metric("Pantry Value", f"${total_val:.2f}")
 
-    col_side3, col_side4 = st.columns(2)
-    col_side3.metric("Items in Stock", len(all_items))
-    col_side4.metric("Expiring Soon", len(expiring_items), delta=-len(expiring_items) if expiring_items else 0, delta_color="inverse")
+    if expiring_items:
+        st.markdown(f"<div style='background: #fff1f2; border: 1px solid #fecdd3; padding: 10px 14px; border-radius: 10px; color: #9f1239; font-size: 0.82rem; font-weight: 700; margin: 10px 0;'>⚠️ {len(expiring_items)} item(s) expiring within 3 days!</div>", unsafe_allow_html=True)
 
     st.divider()
-    if st.button("🗑️ Clear Entire Pantry", use_container_width=True, type="secondary"):
+    if st.button("🗑️ Reset Pantry Database", use_container_width=True, type="secondary"):
         db.clear_all_items()
         st.rerun()
 
-# --- Main App Header & Daily Tracker ---
-st.markdown("# 🥗 NutriWallet: Smart Pantry & Fitness Engine")
-st.caption("Hit your daily macro targets and track real cash saved by cooking what is already in your fridge.")
+# --- Top Hero Banner ---
+st.markdown("""
+<div class="hero-banner">
+    <div class="hero-pill">⚡ Precision Macros • Zero-Waste • Wallet Savings</div>
+    <h1>Eat Like an Athlete. Save Like an Investor.</h1>
+    <p>Snap your fridge or grocery receipts. Our multimodal AI optimizes your daily protein and calories while slashing food waste and calculating money saved vs. takeout.</p>
+</div>
+""", unsafe_allow_html=True)
 
-# Today's Progress Banner
+# --- Real-Time KPI Cards ---
+kpi_col1, kpi_col2, kpi_col3, kpi_col4 = st.columns(4)
+
+with kpi_col1:
+    st.markdown(f"""
+    <div class="kpi-card">
+        <div class="kpi-label">💰 Money Saved Today</div>
+        <div class="kpi-val">+${today_stats['savings']:.2f}</div>
+        <div class="kpi-sub">vs. Restaurant Takeout</div>
+    </div>
+    """, unsafe_allow_html=True)
+
+with kpi_col2:
+    st.markdown(f"""
+    <div class="kpi-card">
+        <div class="kpi-label">💪 Protein Logged</div>
+        <div class="kpi-val">{today_stats['protein_g']:.0f}g</div>
+        <div class="kpi-sub">{today_stats['calories']} Total kcal</div>
+    </div>
+    """, unsafe_allow_html=True)
+
+with kpi_col3:
+    st.markdown(f"""
+    <div class="kpi-card">
+        <div class="kpi-label">🍳 Meals Prepared</div>
+        <div class="kpi-val">{today_stats['meals_count']}</div>
+        <div class="kpi-sub">${today_stats['cost']:.2f} Home Cost</div>
+    </div>
+    """, unsafe_allow_html=True)
+
+with kpi_col4:
+    st.markdown(f"""
+    <div class="kpi-card">
+        <div class="kpi-label">🧊 Fridge Inventory</div>
+        <div class="kpi-val">${total_val:.2f}</div>
+        <div class="kpi-sub">{len(all_items)} Items Active</div>
+    </div>
+    """, unsafe_allow_html=True)
+
+st.write("")
+
+# Today's Progress Chart (If meals are logged)
 if today_stats["meals_count"] > 0:
-    st.markdown("### 🏆 Today's Progress")
-    m1, m2, m3, m4, m5 = st.columns(5)
-    m1.metric("Meals Cooked", today_stats["meals_count"])
-    m2.metric("Protein Logged", f"{today_stats['protein_g']}g")
-    m3.metric("Calories", f"{today_stats['calories']} kcal")
-    m4.metric("Money Saved", f"${today_stats['savings']:.2f}")
-    m5.metric("Cost to Cook", f"${today_stats['cost']:.2f}")
-    
-    macro_chart = render_macro_donut(today_stats['protein_g'], today_stats['carbs_g'], today_stats['fat_g'], "Today's Macro Ratio")
-    if macro_chart:
-        st.plotly_chart(macro_chart, use_container_width=True)
-    st.divider()
+    with st.expander("📊 View Today's Nutritional Breakdown", expanded=True):
+        chart_c1, chart_c2 = st.columns([1, 2])
+        with chart_c1:
+            donut = render_macro_donut(today_stats['protein_g'], today_stats['carbs_g'], today_stats['fat_g'], "Today's Macro Ratio")
+            if donut:
+                st.plotly_chart(donut, use_container_width=True)
+        with chart_c2:
+            st.markdown(f"""
+            <div style='padding: 20px;'>
+                <h4 style='color: #0f172a; margin-bottom: 12px;'>🎯 Daily Nutrition Summary</h4>
+                <p style='color: #64748b; margin-bottom: 8px;'><b>Protein:</b> <span style='color: #10b981; font-weight: 700;'>{today_stats['protein_g']}g</span></p>
+                <p style='color: #64748b; margin-bottom: 8px;'><b>Carbohydrates:</b> <span style='color: #0ea5e9; font-weight: 700;'>{today_stats['carbs_g']}g</span></p>
+                <p style='color: #64748b; margin-bottom: 8px;'><b>Healthy Fats:</b> <span style='color: #f59e0b; font-weight: 700;'>{today_stats['fat_g']}g</span></p>
+                <p style='color: #64748b;'><b>Total Energy:</b> <span style='color: #334155; font-weight: 700;'>{today_stats['calories']} kcal</span></p>
+            </div>
+            """, unsafe_allow_html=True)
 
-# --- Tabs ---
+# --- Main Application Tabs ---
 tab_scan, tab_inventory, tab_chef = st.tabs([
-    "📸 Smart Scan (Fridge / Receipt)",
-    "🧺 Pantry & Value Vault",
-    "🏋️‍♂️💸 NutriWallet AI Chef"
+    "📸 Vision Scanner & Receipt OCR",
+    "🧺 Inventory & Value Vault",
+    "👨‍🍳💸 NutriWallet AI Chef"
 ])
 
 # ==========================================
-# TAB 1: Smart Scan (Fridge & Receipts)
+# TAB 1: Smart Scanner (Fridge / Receipt)
 # ==========================================
 with tab_scan:
-    st.subheader("Dual-Vision Intake: Fridge Photo or Supermarket Receipt")
-    scan_type = st.radio("What are you scanning?", ["📸 Fridge / Pantry Shelves", "🧾 Supermarket Paper Receipt", "✍️ Manual Entry"], horizontal=True)
+    st.markdown("### 📷 Multimodal Smart Intake")
+    st.caption("Upload a fridge photo to auto-detect ingredients and macros, or a paper receipt to extract itemized costs.")
     
+    col_input1, col_input2 = st.columns([1, 2])
+    with col_input1:
+        scan_mode = st.radio(
+            "Scan Type:",
+            ["🧊 Fridge / Pantry Photo", "🧾 Supermarket Receipt", "✍️ Manual Entry"],
+            help="Receipts extract exact prices; Fridge photos estimate macros & shelf life."
+        )
+        if scan_mode != "✍️ Manual Entry":
+            source_type = st.radio("Capture Method:", ["📁 Upload File", "📷 Live Camera"], horizontal=True)
+
     uploaded_image = None
-    if scan_type in ["📸 Fridge / Pantry Shelves", "🧾 Supermarket Paper Receipt"]:
-        input_source = st.radio("Source:", ["Upload Image File", "Use Laptop/Phone Camera"], horizontal=True)
-        if input_source == "Upload Image File":
-            file = st.file_uploader("Upload JPG, PNG or WEBP", type=["jpg", "jpeg", "png", "webp"])
-            if file:
-                uploaded_image = Image.open(file)
-                st.image(uploaded_image, caption="Uploaded Preview", use_container_width=True)
-        else:
-            cam_file = st.camera_input("Capture with Camera")
-            if cam_file:
-                uploaded_image = Image.open(cam_file)
+    with col_input2:
+        if scan_mode != "✍️ Manual Entry":
+            if source_type == "📁 Upload File":
+                img_file = st.file_uploader("Drop image here (JPG, PNG, WEBP)", type=["jpg", "jpeg", "png", "webp"])
+                if img_file:
+                    uploaded_image = Image.open(img_file)
+                    st.image(uploaded_image, caption="Preview", use_container_width=True)
+            else:
+                cam_snap = st.camera_input("Take photo")
+                if cam_snap:
+                    uploaded_image = Image.open(cam_snap)
 
     if uploaded_image is not None:
-        button_label = "🔍 Parse Supermarket Receipt with OCR" if "Receipt" in scan_type else "🔍 Analyze Fridge Ingredients & Macros"
-        if st.button(button_label, type="primary", use_container_width=True):
+        action_btn_text = "🧾 Extract Receipt Items & Prices with OCR" if "Receipt" in scan_mode else "🔍 Analyze Fridge Ingredients & Macros"
+        if st.button(action_btn_text, type="primary", use_container_width=True):
             current_key = st.session_state.get("api_key") or os.getenv("GEMINI_API_KEY")
             if not current_key:
-                st.error("Please enter your Gemini API Key in the sidebar first!")
+                st.error("Please provide your Gemini API Key in the sidebar first!")
             else:
-                with st.spinner("Gemini is reading items, prices, and nutritional profiles..."):
+                with st.spinner("🤖 Gemini Multimodal AI is processing visual details..."):
                     try:
-                        if "Receipt" in scan_type:
-                            res = ai_service.analyze_receipt_image(uploaded_image, api_key=current_key)
-                            st.session_state["temp_detected"] = res.get("items", [])
-                            st.success(f"Receipt from '{res.get('store_name', 'Store')}' parsed! Total: ${res.get('total_spent', 0.0):.2f}")
+                        if "Receipt" in scan_mode:
+                            parsed_data = ai_service.analyze_receipt_image(uploaded_image, api_key=current_key)
+                            st.session_state["temp_detected"] = parsed_data.get("items", [])
+                            st.success(f"Receipt from '{parsed_data.get('store_name', 'Supermarket')}' parsed! Total: ${parsed_data.get('total_spent', 0.0):.2f}")
                         else:
-                            detected = ai_service.analyze_pantry_image(uploaded_image, api_key=current_key)
-                            st.session_state["temp_detected"] = detected
-                            st.success(f"Detected {len(detected)} items with macros and estimated prices!")
+                            detected_items = ai_service.analyze_pantry_image(uploaded_image, api_key=current_key)
+                            st.session_state["temp_detected"] = detected_items
+                            st.success(f"Identified {len(detected_items)} items with estimated protein and freshness windows!")
                     except Exception as e:
-                        st.error(f"Scan analysis failed: {str(e)}")
+                        st.error(f"Vision analysis failed: {str(e)}")
 
-    # Confirmation & Review Table
+    # Review & Confirm Table
     if "temp_detected" in st.session_state and st.session_state["temp_detected"]:
-        st.write("### 🛒 Review & Save Detected Groceries")
+        st.markdown("---")
+        st.markdown("### 🛒 Review & Save Detected Items")
         items_to_save = []
         for i, item in enumerate(st.session_state["temp_detected"]):
-            cols = st.columns([3, 2, 2, 2, 2])
-            name = cols[0].text_input("Item", value=item["name"], key=f"it_name_{i}")
-            qty = cols[1].text_input("Quantity", value=item["quantity"], key=f"it_qty_{i}")
-            price = cols[2].number_input("Price ($)", value=float(item.get("price", 2.50)), step=0.5, key=f"it_prc_{i}")
-            prot = cols[3].number_input("Protein (g)", value=float(item.get("protein_g", 5.0)), step=1.0, key=f"it_prt_{i}")
-            exp = cols[4].text_input("Expiry (YYYY-MM-DD)", value=item["expiry_date"], key=f"it_exp_{i}")
+            c1, c2, c3, c4, c5 = st.columns([3, 2, 2, 2, 2])
+            name = c1.text_input("Item Name", value=item["name"], key=f"t_name_{i}")
+            qty = c2.text_input("Qty", value=item["quantity"], key=f"t_qty_{i}")
+            price = c3.number_input("Price ($)", value=float(item.get("price", 2.50)), step=0.25, key=f"t_prc_{i}")
+            prot = c4.number_input("Protein (g)", value=float(item.get("protein_g", 5.0)), step=1.0, key=f"t_prot_{i}")
+            exp = c5.text_input("Expiry (YYYY-MM-DD)", value=item["expiry_date"], key=f"t_exp_{i}")
             
             items_to_save.append({
                 "name": name,
@@ -221,7 +446,7 @@ with tab_scan:
                 "notes": item.get("notes", "")
             })
 
-        if st.button("✅ Confirm & Save All to Inventory", type="primary", use_container_width=True):
+        if st.button("💾 Save All Items to Inventory", type="primary", use_container_width=True):
             for it in items_to_save:
                 db.add_item(
                     name=it["name"],
@@ -236,23 +461,23 @@ with tab_scan:
                     fat_g=it["fat_g"]
                 )
             del st.session_state["temp_detected"]
-            st.success("All items saved to inventory!")
+            st.toast("Groceries saved to inventory successfully!", icon="✅")
             st.rerun()
 
-    if scan_type == "✍️ Manual Entry":
-        with st.form("manual_entry_form"):
-            c1, c2, c3 = st.columns(3)
-            name = c1.text_input("Item Name (e.g., Chicken Breast, Oats)")
-            qty = c2.text_input("Quantity (e.g., 500g, 1 carton)")
-            price = c3.number_input("Price ($)", value=3.99, step=0.5)
-            
-            c4, c5, c6 = st.columns(3)
-            category = c4.selectbox("Category", ["Meat/Protein", "Produce", "Dairy", "Bakery", "Condiments", "Beverages", "Pantry", "Other"])
-            protein = c5.number_input("Est. Protein (grams)", value=25.0, step=1.0)
-            exp_date = c6.date_input("Expiry Date", value=datetime.today())
+    if scan_mode == "✍️ Manual Entry":
+        with st.form("manual_add_form"):
+            st.markdown("#### Quick Add Form")
+            m_c1, m_c2, m_c3 = st.columns(3)
+            name = m_c1.text_input("Item Name (e.g. Greek Yogurt, Eggs, Tofu)")
+            qty = m_c2.text_input("Quantity (e.g. 500g, 6 pack)")
+            price = m_c3.number_input("Price ($)", value=3.49, step=0.5)
 
-            submit = st.form_submit_button("Add Item", type="primary")
-            if submit:
+            m_c4, m_c5, m_c6 = st.columns(3)
+            category = m_c4.selectbox("Category", ["Meat/Protein", "Produce", "Dairy", "Bakery", "Condiments", "Beverages", "Pantry", "Other"])
+            protein = m_c5.number_input("Protein (grams)", value=20.0, step=1.0)
+            exp_date = m_c6.date_input("Expiry Date", value=datetime.today())
+
+            if st.form_submit_button("Add to Pantry", type="primary"):
                 if name.strip():
                     db.add_item(
                         name=name,
@@ -262,101 +487,111 @@ with tab_scan:
                         price=price,
                         protein_g=protein
                     )
-                    st.success(f"Added {name}!")
+                    st.toast(f"Added {name}!", icon="🥑")
                     st.rerun()
                 else:
                     st.error("Name is required.")
 
 # ==========================================
-# TAB 2: Pantry & Value Vault
+# TAB 2: Inventory & Value Vault
 # ==========================================
 with tab_inventory:
     all_items = db.get_all_items()
     expiring_items = db.get_expiring_soon_items(days_ahead=3)
     
-    if expiring_items:
-        st.warning(f"⚠️ **Urgent:** You have **{len(expiring_items)} item(s)** expiring within 3 days! Check the Chef tab to cook them before money goes to waste.")
+    col_filter1, col_filter2 = st.columns([2, 1])
+    with col_filter1:
+        cat_choices = ["All Categories"] + sorted(list({it["category"] for it in all_items}))
+        selected_category = st.selectbox("Filter by Category", cat_choices)
+    with col_filter2:
+        st.write("")
+        st.write("")
+        st.markdown(f"**Total Pantry Assets:** <span class='tag-price'>${total_val:.2f}</span>", unsafe_allow_html=True)
 
-    if not all_items:
-        st.info("Your pantry is empty. Use the Smart Scan tab to add items from photos or receipts!")
+    filtered_items = all_items if selected_category == "All Categories" else [it for it in all_items if it["category"] == selected_category]
+
+    if not filtered_items:
+        st.info("No items in this category. Add groceries via the Vision Scanner tab!")
     else:
-        cat_list = ["All"] + sorted(list({item["category"] for item in all_items}))
-        selected_cat = st.selectbox("Filter by Category", cat_list)
-        filtered = all_items if selected_cat == "All" else [it for it in all_items if it["category"] == selected_cat]
-
-        st.write(f"Showing **{len(filtered)}** items (Total Value: **${sum(it.get('price', 0) for it in filtered):.2f}**):")
-        
         today = datetime.now().date()
-        for it in filtered:
-            col1, col2, col3, col4, col5 = st.columns([3, 2, 2, 2, 1])
-            col1.markdown(f"**{it['name']}**")
-            col2.caption(f"Qty: {it['quantity']} • 💲**${it.get('price', 0.0):.2f}**")
-            col3.markdown(f"<span class='macro-badge'>💪 {it.get('protein_g', 0)}g Protein</span>", unsafe_allow_html=True)
-            
+        for it in filtered_items:
+            # Urgency status styling
+            urgency_html = "<span class='tag-urgency-good'>Fresh</span>"
             if it["expiry_date"]:
                 try:
                     exp_d = datetime.strptime(it["expiry_date"], "%Y-%m-%d").date()
                     delta = (exp_d - today).days
                     if delta < 0:
-                        col4.markdown(f"<span class='warning-badge'>Expired {abs(delta)}d ago</span>", unsafe_allow_html=True)
+                        urgency_html = f"<span class='tag-urgency-danger'>⚠️ Expired {abs(delta)}d ago</span>"
                     elif delta <= 3:
-                        col4.markdown(f"<span class='warning-badge'>Expires in {delta}d</span>", unsafe_allow_html=True)
+                        urgency_html = f"<span class='tag-urgency-warning'>⏳ Expires in {delta}d</span>"
                     else:
-                        col4.markdown(f"<span class='good-badge'>Fresh ({delta}d)</span>", unsafe_allow_html=True)
+                        urgency_html = f"<span class='tag-urgency-good'>Fresh ({delta}d left)</span>"
                 except ValueError:
-                    col4.caption(it["expiry_date"])
-            else:
-                col4.caption("No expiry date")
+                    urgency_html = f"<span>{it['expiry_date']}</span>"
 
-            if col5.button("❌", key=f"del_{it['id']}", help="Delete item"):
+            # Render custom sleek food row
+            f_col1, f_col2, f_col3, f_col4, f_col5 = st.columns([3, 2, 2, 2, 1])
+            f_col1.markdown(f"**{it['name']}**<br><span style='color: #64748b; font-size: 0.8rem;'>{it['quantity']} • {it['category']}</span>", unsafe_allow_html=True)
+            f_col2.markdown(f"<span class='tag-price'>💲 ${it.get('price', 0.0):.2f}</span>", unsafe_allow_html=True)
+            f_col3.markdown(f"<span class='tag-macro'>💪 {it.get('protein_g', 0):.0f}g Protein</span>", unsafe_allow_html=True)
+            f_col4.markdown(urgency_html, unsafe_allow_html=True)
+            
+            if f_col5.button("🗑️", key=f"del_item_{it['id']}", help="Delete item"):
                 db.delete_item(it['id'])
                 st.rerun()
-            st.divider()
+            st.markdown("<hr style='margin: 8px 0; border: none; border-top: 1px solid #f1f5f9;'/>", unsafe_allow_html=True)
 
 # ==========================================
 # TAB 3: NutriWallet AI Chef
 # ==========================================
 with tab_chef:
-    st.subheader("🏋️‍♂️ Precision Macro & Wallet-Saver Recipe Generator")
-    st.caption("Generates meals designed to hit your exact fitness targets while calculating how much money you save vs. takeout.")
-    
-    all_items = db.get_all_items()
-    expiring_items = db.get_expiring_soon_items(days_ahead=3)
-    
-    if not all_items:
-        st.info("Please add ingredients to your pantry before synthesizing meals.")
-    else:
-        # Fitness & Budget Goal Controls
-        col_g1, col_g2, col_g3 = st.columns(3)
-        goal_preset = col_g1.selectbox(
-            "Fitness Objective", 
-            ["High-Protein Cut (Fat Loss)", "Lean Muscle Bulk", "Keto / Low-Carb", "Budget Minimalist", "Endurance / Carb-Fuel"]
-        )
-        meal_type = col_g2.selectbox("Meal Type", ["Dinner", "Lunch", "Post-Workout Meal", "Breakfast", "Quick Bowl"])
-        max_time = col_g3.slider("Max Cooking Time (mins)", 10, 60, 25, step=5)
+    st.markdown("### 👨‍🍳 Precision Macro & Budget Recipe Synthesizer")
+    st.caption("AI calculates the exact ingredient portions to hit your target calories and protein while maximizing takeout savings.")
 
-        col_t1, col_t2 = st.columns(2)
-        target_protein = col_t1.slider("Target Protein per Serving (grams)", 15, 80, 40, step=5)
-        target_cals = col_t2.slider("Target Calories per Serving (kcal)", 250, 1000, 500, step=50)
+    if not all_items:
+        st.info("Your pantry is currently empty. Please add items in the Scanner tab first!")
+    else:
+        # Settings Bar
+        cfg_c1, cfg_c2, cfg_c3 = st.columns(3)
+        with cfg_c1:
+            goal_preset = st.selectbox(
+                "🎯 Fitness Goal",
+                ["High-Protein Cut (Fat Loss)", "Lean Muscle Bulk", "Keto / Low-Carb", "Budget Minimalist", "Endurance / Carb-Fuel"]
+            )
+        with cfg_c2:
+            meal_kind = st.selectbox("🍽️ Meal Type", ["Dinner", "Post-Workout Lunch", "High-Protein Breakfast", "Quick Stir-Fry Bowl"])
+        with cfg_c3:
+            max_cook_time = st.slider("⏱️ Max Cooking Time", 10, 60, 25, step=5)
+
+        tar_c1, tar_c2 = st.columns(2)
+        with tar_c1:
+            target_protein = st.slider("Target Protein / Serving", 15, 80, 42, step=1, format="%d g")
+        with tar_c2:
+            target_calories = st.slider("Target Calories / Serving", 250, 1000, 520, step=25, format="%d kcal")
 
         if expiring_items:
-            st.info(f"Targeting **{len(expiring_items)} expiring items**: " + ", ".join([it['name'] for it in expiring_items]))
+            st.markdown(f"""
+            <div style='background: #fffbeb; border: 1px solid #fde68a; border-radius: 10px; padding: 10px 14px; color: #92400e; font-size: 0.88rem; margin: 12px 0;'>
+                🥦 <b>Expiring Ingredients Targeted:</b> {', '.join([it['name'] for it in expiring_items])}
+            </div>
+            """, unsafe_allow_html=True)
 
-        if st.button("🍳 Synthesize Macro & Budget Recipe", type="primary", use_container_width=True):
+        if st.button("🚀 Synthesize Targeted Recipe & Calculate Savings", type="primary", use_container_width=True):
             current_key = st.session_state.get("api_key") or os.getenv("GEMINI_API_KEY")
             if not current_key:
                 st.error("Please enter your Gemini API Key in the sidebar.")
             else:
-                with st.spinner("AI Chef & Sports Nutritionist is formulating your optimal recipe..."):
+                with st.spinner("🧑‍🍳 Formulating recipe, calculating cost-per-plate, and verifying macronutrients..."):
                     try:
                         recipe = ai_service.generate_recipe(
                             available_items=all_items,
                             expiring_soon_items=expiring_items,
                             fitness_goal=goal_preset,
                             target_protein_g=target_protein,
-                            target_calories=target_cals,
-                            meal_type=meal_type,
-                            max_time_minutes=max_time,
+                            target_calories=target_calories,
+                            meal_type=meal_kind,
+                            max_time_minutes=max_cook_time,
                             api_key=current_key
                         )
                         st.session_state["current_recipe"] = recipe
@@ -369,63 +604,80 @@ with tab_chef:
             cost = rc.get("cost_analysis", {})
             nutr = rc.get("nutritional_profile", {})
             
-            st.markdown(f"## 🍽️ {rc.get('title', 'Chef Recipe')}")
-            st.caption(f"⏱️ Prep: {rc.get('prep_time_minutes', 10)} mins | Cook: {rc.get('cook_time_minutes', 15)} mins | Servings: {rc.get('servings', 2)}")
+            st.markdown("---")
+            st.markdown(f"# 🍽️ {rc.get('title', 'Chef Creation')}")
+            st.markdown(f"""
+                <span class='tag-macro'>⏱️ {rc.get('prep_time_minutes', 10) + rc.get('cook_time_minutes', 15)} Mins Total</span>
+                <span class='tag-macro'>👥 {rc.get('servings', 2)} Servings</span>
+                <span class='tag-macro'>💪 {nutr.get('protein_g', 40)}g Protein</span>
+                <span class='tag-price'>💰 ${cost.get('cost_to_cook_per_serving', 2.50):.2f} / Plate</span>
+            """, unsafe_allow_html=True)
 
-            # --- Financial & Savings Banner ---
-            st.markdown("### 💸 Cost & Takeout Comparison")
-            c_cost1, c_cost2, c_cost3, c_cost4 = st.columns(4)
-            c_cost1.metric("Home Cook Cost", f"${cost.get('cost_to_cook_per_serving', 2.50):.2f}")
-            c_cost2.metric("Takeout Equivalent", f"${cost.get('takeout_equivalent_cost', 15.00):.2f}")
-            c_cost3.metric("Money Saved / Plate", f"+${cost.get('money_saved_per_serving', 12.50):.2f}", delta="Saved")
-            c_cost4.metric("Protein Efficiency", f"${cost.get('cost_per_gram_protein', 0.06):.2f}/g")
+            # --- Financial Savings Showcase ---
+            saved_total = cost.get('money_saved_per_serving', 12.0) * rc.get('servings', 2)
+            st.markdown(f"""
+            <div class="savings-showcase">
+                <div style='text-transform: uppercase; letter-spacing: 0.05em; font-size: 0.8rem; font-weight: 700; color: #86efac;'>Wallet Intelligence Report</div>
+                <h3>🎉 Total Estimated Savings: ${saved_total:.2f}</h3>
+                <p style='color: #dcfce7; margin: 4px 0 12px 0;'>Cost to cook at home: <b>${cost.get('cost_to_cook_per_serving', 2.50):.2f}/serving</b> vs. Restaurant/Delivery: <b>${cost.get('takeout_equivalent_cost', 15.00):.2f}/serving</b></p>
+                <div style='display: flex; gap: 15px; flex-wrap: wrap;'>
+                    <span style='background: rgba(255,255,255,0.15); padding: 4px 12px; border-radius: 6px; font-size: 0.85rem;'>⚡ Protein Efficiency: <b>${cost.get('cost_per_gram_protein', 0.06):.2f} / gram</b></span>
+                    <span style='background: rgba(255,255,255,0.15); padding: 4px 12px; border-radius: 6px; font-size: 0.85rem;'>🌱 Food Waste Prevented</span>
+                </div>
+            </div>
+            """, unsafe_allow_html=True)
 
-            st.markdown(f"<span class='savings-badge'>🎉 You save approx ${cost.get('money_saved_per_serving', 12.0) * rc.get('servings', 2):.2f} total compared to DoorDash/takeout!</span>", unsafe_allow_html=True)
-            st.write("")
-
-            # --- Macro Breakdown & Donut Chart ---
-            st.markdown("### 🏋️‍♂️ Macronutrient Profile (Per Serving)")
-            cm1, cm2 = st.columns([2, 3])
-            with cm1:
-                st.metric("Calories", f"{nutr.get('calories', 500)} kcal")
-                st.metric("Protein", f"{nutr.get('protein_g', 40)}g")
-                st.metric("Carbohydrates", f"{nutr.get('carbs_g', 45)}g")
-                st.metric("Healthy Fats", f"{nutr.get('fat_g', 15)}g")
+            # --- Macronutrient Visuals ---
+            macro_col1, macro_col2 = st.columns([1, 1])
+            with macro_col1:
+                st.markdown("#### 🏋️ Macronutrients (Per Serving)")
+                nm1, nm2 = st.columns(2)
+                nm1.metric("Calories", f"{nutr.get('calories', 500)} kcal")
+                nm2.metric("Protein", f"{nutr.get('protein_g', 42)}g")
+                nm3, nm4 = st.columns(2)
+                nm3.metric("Carbs", f"{nutr.get('carbs_g', 45)}g")
+                nm4.metric("Healthy Fats", f"{nutr.get('fat_g', 14)}g")
+                
                 if rc.get("macro_alignment_tip"):
                     st.info(f"💡 {rc.get('macro_alignment_tip')}")
 
-            with cm2:
+            with macro_col2:
                 pie = render_macro_donut(
-                    nutr.get('protein_g', 40),
+                    nutr.get('protein_g', 42),
                     nutr.get('carbs_g', 45),
-                    nutr.get('fat_g', 15),
-                    "Per Serving Macro Split"
+                    nutr.get('fat_g', 14),
+                    "Serving Macro Distribution"
                 )
                 if pie:
                     st.plotly_chart(pie, use_container_width=True)
 
-            # --- Ingredients & Instructions ---
-            st.divider()
-            ci1, ci2 = st.columns(2)
-            with ci1:
-                st.markdown("### 🛒 Ingredients From Your Pantry")
+            # --- Ingredients & Cooking Steps ---
+            st.markdown("---")
+            ing_col1, ing_col2 = st.columns(2)
+            with ing_col1:
+                st.markdown("#### 🛒 Ingredients From Your Pantry")
                 for ing in rc.get("ingredients_used", []):
-                    st.markdown(f"- ✅ {ing}")
-            with ci2:
-                st.markdown("### 🧂 Staples / Additional")
-                for add in rc.get("additional_needed", []):
-                    st.markdown(f"- 🔸 {add}")
+                    st.markdown(f"• **{ing}**")
 
-            st.markdown("### 📋 Step-by-Step Instructions")
-            for step in rc.get("instructions", []):
-                st.markdown(f"1. {step}")
+            with ing_col2:
+                st.markdown("#### 🧂 Common Staples / Seasoning")
+                for add in rc.get("additional_needed", []):
+                    st.markdown(f"• {add}")
+
+            st.markdown("#### 📋 Step-by-Step Instructions")
+            for idx, step in enumerate(rc.get("instructions", []), 1):
+                st.markdown(f"""
+                <div class="step-box">
+                    <b>Step {idx}:</b> {step}
+                </div>
+                """, unsafe_allow_html=True)
 
             if rc.get("zero_waste_tip"):
-                st.success(f"🌱 **Zero-Waste Impact:** {rc.get('zero_waste_tip')}")
+                st.success(f"🌱 **Zero-Waste Hack:** {rc.get('zero_waste_tip')}")
 
             # --- Log Meal Action ---
-            st.divider()
-            if st.button("✅ I Cooked This Meal! (Log to Today's Health & Wallet Tracker)", type="primary", use_container_width=True):
+            st.markdown("---")
+            if st.button("🏆 I Cooked This Meal! (Log to Today's Dashboard)", type="primary", use_container_width=True):
                 db.log_meal(
                     recipe_title=rc.get("title", "NutriWallet Meal"),
                     calories=int(nutr.get("calories", 0)),
@@ -436,5 +688,5 @@ with tab_chef:
                     takeout_savings=float(cost.get("money_saved_per_serving", 0.0))
                 )
                 st.balloons()
-                st.success("Meal logged to your daily tracker! Check your dashboard progress at the top.")
+                st.toast("Meal successfully logged! Look at your updated dashboard metrics above.", icon="🎉")
                 st.rerun()
